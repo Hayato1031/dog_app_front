@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit, Trash2, Pill, Dog, Sunrise, Sun, Moon } from 'lucide-react';
+import { Edit, Trash2, Pill, Dog, Sunrise, Sun, Moon, MoreVertical } from 'lucide-react';
 import { Medicine } from '@/types';
 import { medicineAPI } from '@/lib/api';
 
@@ -13,6 +13,7 @@ interface MedicineListProps {
 export default function MedicineList({ onEdit, refreshTrigger }: MedicineListProps) {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const fetchMedicines = async () => {
     try {
@@ -28,6 +29,18 @@ export default function MedicineList({ onEdit, refreshTrigger }: MedicineListPro
   useEffect(() => {
     fetchMedicines();
   }, [refreshTrigger]);
+
+  // メニューの外側クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenMenuId(null);
+    };
+
+    if (openMenuId !== null) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openMenuId]);
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('この薬を削除しますか？')) return;
@@ -81,26 +94,27 @@ export default function MedicineList({ onEdit, refreshTrigger }: MedicineListPro
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {medicine.morning_dose && medicine.morning_dose > 0 && (
-                        <span className="bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                        <span className="bg-gradient-to-r from-yellow-200 to-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 whitespace-nowrap">
                           <Sunrise size={14} />
                           <span>朝: {Number(medicine.morning_dose).toFixed(2)}{medicine.unit}</span>
                         </span>
                       )}
                       {medicine.evening_dose && medicine.evening_dose > 0 && (
-                        <span className="bg-gradient-to-r from-orange-200 to-orange-300 text-orange-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                        <span className="bg-gradient-to-r from-orange-200 to-orange-300 text-orange-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 whitespace-nowrap">
                           <Sun size={14} />
                           <span>昼: {Number(medicine.evening_dose).toFixed(2)}{medicine.unit}</span>
                         </span>
                       )}
                       {medicine.night_dose && medicine.night_dose > 0 && (
-                        <span className="bg-gradient-to-r from-purple-200 to-purple-300 text-purple-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                        <span className="bg-gradient-to-r from-purple-200 to-purple-300 text-purple-900 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 whitespace-nowrap">
                           <Moon size={14} />
                           <span>夜: {Number(medicine.night_dose).toFixed(2)}{medicine.unit}</span>
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="flex space-x-2 ml-4">
+                  {/* デスクトップ: 従来のボタン */}
+                  <div className="hidden md:flex space-x-2 ml-4">
                     <button
                       onClick={() => onEdit(medicine)}
                       className="p-2 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
@@ -113,6 +127,47 @@ export default function MedicineList({ onEdit, refreshTrigger }: MedicineListPro
                     >
                       <Trash2 size={18} />
                     </button>
+                  </div>
+
+                  {/* スマホ: 三点リーダーメニュー */}
+                  <div className="md:hidden relative ml-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === medicine.id ? null : medicine.id);
+                      }}
+                      className="p-2 text-orange-400 hover:text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                    
+                    {openMenuId === medicine.id && (
+                      <div 
+                        className="absolute right-0 top-full mt-1 bg-white border-2 border-orange-200 rounded-lg shadow-lg z-10 min-w-[120px]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => {
+                            onEdit(medicine);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full flex items-center space-x-2 px-4 py-3 text-left text-orange-700 hover:bg-orange-50 transition-colors"
+                        >
+                          <Edit size={16} />
+                          <span>編集</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleDelete(medicine.id);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full flex items-center space-x-2 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
+                        >
+                          <Trash2 size={16} />
+                          <span>削除</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -42,6 +42,54 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
     return doseRecords.find(record => record.medicine_id === medicineId);
   };
 
+  const getCurrentJSTTime = () => {
+    // JST (日本標準時) での現在時刻を取得
+    const now = new Date();
+    
+    // Asia/Tokyo タイムゾーンでのDate オブジェクトを作成
+    const jstDate = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+    
+    const hours = jstDate.getHours().toString().padStart(2, '0');
+    const minutes = jstDate.getMinutes().toString().padStart(2, '0');
+    
+    return `${hours}:${minutes}`;
+  };
+
+  const formatTimeForInput = (timeString: string | null | undefined): string => {
+    if (!timeString) return '';
+    
+    // 時間文字列が "HH:MM" 形式の場合はそのまま返す
+    if (/^\d{2}:\d{2}$/.test(timeString)) {
+      return timeString;
+    }
+    
+    // 時間文字列が "HH:MM:SS" 形式の場合は "HH:MM" に変換
+    if (/^\d{2}:\d{2}:\d{2}/.test(timeString)) {
+      return timeString.slice(0, 5);
+    }
+    
+    // ISO文字列の場合（例: "2000-01-01T17:50:00.000Z"）
+    // バックエンドのtime型から返される形式なので、時間部分のみ抽出（JST変換不要）
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(timeString)) {
+      const timeOnly = timeString.substring(11, 16); // "T17:50:00" から "17:50" を抽出
+      return timeOnly;
+    }
+    
+    // その他のDate文字列の場合は時間部分のみ抽出（タイムゾーン変換なし）
+    try {
+      const date = new Date(timeString);
+      if (!isNaN(date.getTime())) {
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+    } catch (error) {
+      console.warn('時間のフォーマットに失敗しました:', timeString);
+    }
+    
+    return '';
+  };
+
   const handleDoseToggle = async (
     medicineId: number, 
     doseTime: 'morning_taken' | 'evening_taken' | 'night_taken',
@@ -53,10 +101,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
       const dateString = format(selectedDate, 'yyyy-MM-dd');
       
       const timeField = doseTime.replace('_taken', '_time') as 'morning_time' | 'evening_time' | 'night_time';
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const currentTime = time || `${hours}:${minutes}`;
+      const currentTime = time || getCurrentJSTTime();
       
       const updateData = {
         [doseTime]: !currentValue,
@@ -103,10 +148,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
     medicineId: number,
     timeField: 'morning_time' | 'evening_time' | 'night_time'
   ) => {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const currentTime = `${hours}:${minutes}`;
+    const currentTime = getCurrentJSTTime();
     handleTimeChange(medicineId, timeField, currentTime);
   };
 
@@ -217,7 +259,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                                 </p>
                                 {record?.morning_taken && record?.morning_time && (
                                   <p className="text-sm text-yellow-800 font-medium">
-                                    {record.morning_time.slice(0, 5)}
+                                    {formatTimeForInput(record.morning_time)}
                                   </p>
                                 )}
                               </div>
@@ -242,7 +284,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                               <Clock size={14} className="text-yellow-600" />
                                                           <input
                               type="time"
-                              value={record?.morning_time ? record.morning_time.slice(0, 5) : ''}
+                              value={formatTimeForInput(record?.morning_time)}
                               onChange={(e) => handleTimeChange(medicine.id, 'morning_time', e.target.value)}
                               className="text-sm border border-yellow-300 rounded px-2 py-1 bg-yellow-50 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                             />
@@ -293,7 +335,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                                 </p>
                                 {record?.evening_taken && record?.evening_time && (
                                   <p className="text-sm text-orange-800 font-medium">
-                                    {record.evening_time.slice(0, 5)}
+                                    {formatTimeForInput(record.evening_time)}
                                   </p>
                                 )}
                               </div>
@@ -318,7 +360,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                               <Clock size={14} className="text-orange-600" />
                                                           <input
                               type="time"
-                              value={record?.evening_time ? record.evening_time.slice(0, 5) : ''}
+                              value={formatTimeForInput(record?.evening_time)}
                               onChange={(e) => handleTimeChange(medicine.id, 'evening_time', e.target.value)}
                               className="text-sm border border-orange-300 rounded px-2 py-1 bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                             />
@@ -369,7 +411,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                                 </p>
                                 {record?.night_taken && record?.night_time && (
                                   <p className="text-sm text-purple-800 font-medium">
-                                    {record.night_time.slice(0, 5)}
+                                    {formatTimeForInput(record.night_time)}
                                   </p>
                                 )}
                               </div>
@@ -394,7 +436,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
                               <Clock size={14} className="text-purple-600" />
                                                           <input
                               type="time"
-                              value={record?.night_time ? record.night_time.slice(0, 5) : ''}
+                              value={formatTimeForInput(record?.night_time)}
                               onChange={(e) => handleTimeChange(medicine.id, 'night_time', e.target.value)}
                               className="text-sm border border-purple-300 rounded px-2 py-1 bg-purple-50 focus:ring-2 focus:ring-purple-400 focus:border-transparent"
                             />
