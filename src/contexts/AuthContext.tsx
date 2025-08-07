@@ -73,11 +73,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Attempting login...');
       const response: AuthResponse = await authAPI.login(email, password);
       console.log('Login successful, setting token and user');
-      setToken(response.token);
-      setUser(response.user);
+      
+      // まずローカルストレージに保存
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       console.log('Token and user stored in localStorage');
+      
+      // 次にstateを更新
+      setToken(response.token);
+      setUser(response.user);
+      console.log('State updated with token and user');
+      
+      // トークンが設定されたことを確認
+      console.log('Token in localStorage:', localStorage.getItem('token'));
     } catch (error) {
       console.error('Login error:', error);
       throw error;
