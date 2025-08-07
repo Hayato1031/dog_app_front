@@ -34,24 +34,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const initializeAuth = async () => {
+      console.log('Initializing authentication...');
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+      console.log('Stored token exists:', !!storedToken);
+      console.log('Stored user exists:', !!storedUser);
+
+      if (storedToken && storedUser) {
+        try {
+          console.log('Verifying token with backend...');
+          // Verify token is still valid
+          const response = await authAPI.verifyToken();
+          console.log('Token verification successful');
+          setToken(storedToken);
+          setUser(response.user);
+        } catch (error) {
+          // Token is invalid, clear storage
+          console.log('Token verification failed, clearing storage', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setToken(null);
+          setUser(null);
+        }
+      } else {
+        console.log('No stored credentials found');
+      }
+      setLoading(false);
+      console.log('Authentication initialization complete');
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Attempting login...');
       const response: AuthResponse = await authAPI.login(email, password);
+      console.log('Login successful, setting token and user');
       setToken(response.token);
       setUser(response.user);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('Token and user stored in localStorage');
     } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -63,12 +91,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     passwordConfirmation: string
   ) => {
     try {
+      console.log('Attempting registration...');
       const response: AuthResponse = await authAPI.register(name, email, password, passwordConfirmation);
+      console.log('Registration successful, setting token and user');
       setToken(response.token);
       setUser(response.user);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('Token and user stored in localStorage');
     } catch (error) {
+      console.error('Registration error:', error);
       throw error;
     }
   };
@@ -81,6 +113,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const isAuthenticated = !!token && !!user;
+
+  // Debug: Log authentication state changes
+  useEffect(() => {
+    console.log('Authentication state changed:', {
+      isAuthenticated,
+      hasToken: !!token,
+      hasUser: !!user,
+      loading
+    });
+  }, [isAuthenticated, token, user, loading]);
 
   const value: AuthContextType = {
     user,

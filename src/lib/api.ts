@@ -28,9 +28,17 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Only clear storage and redirect if it's not the /auth/me endpoint
+      if (!error.config?.url?.includes('/auth/me')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Delay redirect to avoid immediate redirect during login
+        setTimeout(() => {
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+            window.location.href = '/login';
+          }
+        }, 100);
+      }
     }
     return Promise.reject(error);
   }
@@ -50,6 +58,11 @@ export const authAPI = {
       password, 
       password_confirmation 
     });
+    return response.data;
+  },
+
+  verifyToken: async () => {
+    const response = await apiClient.get('/auth/me');
     return response.data;
   },
 };
