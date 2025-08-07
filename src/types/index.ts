@@ -23,6 +23,12 @@ export interface DoseRecord {
   morning_taken: boolean;
   evening_taken: boolean;
   night_taken: boolean;
+  morning_time?: string;
+  evening_time?: string;
+  night_time?: string;
+  morning_dose_at_time?: number;
+  evening_dose_at_time?: number;
+  night_dose_at_time?: number;
   user_id: number;
   created_at: string;
   updated_at: string;

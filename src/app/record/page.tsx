@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar } from 'lucide-react';
@@ -8,7 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import DailyDoseRecord from '@/components/DailyDoseRecord';
 
-export default function RecordPage() {
+// useSearchParams()を使用するコンポーネントをSuspenseで囲むために分離
+function RecordPageContent() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,7 +43,6 @@ export default function RecordPage() {
     return null;
   }
 
-
   return (
     <div className="min-h-screen pb-20">
       <Header title="服薬記録" showBack />
@@ -69,5 +69,17 @@ export default function RecordPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function RecordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <RecordPageContent />
+    </Suspense>
   );
 }
