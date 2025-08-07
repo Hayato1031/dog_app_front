@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Pill, Dog, Sunrise, Sun, Moon } from 'lucide-react';
+import { Edit, Trash2, Pill, Dog, Sunrise, Sun, Moon } from 'lucide-react';
 import { Medicine } from '@/types';
 import { medicineAPI } from '@/lib/api';
 

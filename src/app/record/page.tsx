@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import DailyDoseRecord from '@/components/DailyDoseRecord';
 
 export default function RecordPage() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -42,10 +42,6 @@ export default function RecordPage() {
     return null;
   }
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
 
   return (
     <div className="min-h-screen pb-20">

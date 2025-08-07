@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import Calendar from '@/components/Calendar';
 
 export default function CalendarPage() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 

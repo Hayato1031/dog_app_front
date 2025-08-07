@@ -8,7 +8,6 @@ import {
   Heart, 
   Activity, 
   Calendar, 
-  TrendingUp, 
   ArrowLeft,
   ArrowRight,
   Star,

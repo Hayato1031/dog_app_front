@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Check, ArrowLeft, ArrowRight, Sunrise, Sun, Moon, Pill } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
   const [doseRecords, setDoseRecords] = useState<DoseRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [medicinesData, recordsData] = await Promise.all([
@@ -32,11 +32,11 @@ export default function DailyDoseRecord({ selectedDate, onDateChange }: DailyDos
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchData();
-  }, [selectedDate]);
+  }, [selectedDate, fetchData]);
 
   const getDoseRecord = (medicineId: number): DoseRecord | undefined => {
     return doseRecords.find(record => record.medicine_id === medicineId);

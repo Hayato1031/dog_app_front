@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Menu, X, LogOut, User, Heart, Home, FileText, Calendar } from 'lucide-react';
+import { Menu, X, LogOut, Heart, Home, FileText, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {

@@ -10,7 +10,7 @@ import MedicineList from '@/components/MedicineList';
 import MedicineForm from '@/components/MedicineForm';
 
 export default function Home() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const [showMedicineForm, setShowMedicineForm] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
@@ -53,10 +53,6 @@ export default function Home() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
 
   return (
     <div className="min-h-screen pb-20">

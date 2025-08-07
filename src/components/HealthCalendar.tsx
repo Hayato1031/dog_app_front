@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameMonth, isSameDay } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Stethoscope, Heart, Activity } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Stethoscope, Heart } from 'lucide-react';
 import { HealthCalendarData } from '@/types';
 import { healthRecordAPI } from '@/lib/api';
 

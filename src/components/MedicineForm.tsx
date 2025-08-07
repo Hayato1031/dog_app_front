@@ -67,10 +67,11 @@ export default function MedicineForm({ medicine, isOpen, onClose, onSuccess }: M
       }
       onSuccess();
       onClose();
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.errors 
-        ? Object.values(err.response.data.errors).flat().join(', ')
-        : err.response?.data?.error || '薬の保存に失敗しました';
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { errors?: Record<string, string[]>; error?: string } } };
+      const errorMessage = error.response?.data?.errors 
+        ? Object.values(error.response.data.errors).flat().join(', ')
+        : error.response?.data?.error || '薬の保存に失敗しました';
       setError(errorMessage);
     } finally {
       setLoading(false);
