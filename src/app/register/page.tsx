@@ -18,25 +18,36 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== REGISTER FORM SUBMITTED ===');
+    console.log('Name:', name);
+    console.log('Email:', email);
+    console.log('Password length:', password.length);
+    
     setLoading(true);
     setError('');
 
     if (password !== passwordConfirmation) {
+      console.log('Password mismatch error');
       setError('パスワードが一致しません');
       setLoading(false);
       return;
     }
 
     try {
+      console.log('About to call register function...');
       await register(name, email, password, passwordConfirmation);
+      console.log('Register function completed, redirecting...');
       router.push('/');
     } catch (err: unknown) {
+      console.error('Register error caught:', err);
       const error = err as { response?: { data?: { errors?: Record<string, string[]>; error?: string } } };
       const errorMessage = error.response?.data?.errors 
         ? Object.values(error.response.data.errors).flat().join(', ')
         : error.response?.data?.error || '登録に失敗しました';
+      console.log('Error message:', errorMessage);
       setError(errorMessage);
     } finally {
+      console.log('Register process completed, setting loading to false');
       setLoading(false);
     }
   };

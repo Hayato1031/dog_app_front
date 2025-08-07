@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+console.log('API_BASE_URL:', API_BASE_URL);
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -47,22 +49,31 @@ apiClient.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
+    console.log('authAPI.login called with:', { email, passwordLength: password.length });
+    console.log('Making request to:', `${API_BASE_URL}/auth/login`);
     const response = await apiClient.post('/auth/login', { email, password });
+    console.log('Login API response:', response.data);
     return response.data;
   },
   
   register: async (name: string, email: string, password: string, password_confirmation: string) => {
+    console.log('authAPI.register called with:', { name, email, passwordLength: password.length });
+    console.log('Making request to:', `${API_BASE_URL}/auth/register`);
     const response = await apiClient.post('/auth/register', { 
       name, 
       email, 
       password, 
       password_confirmation 
     });
+    console.log('Register API response:', response.data);
     return response.data;
   },
 
   verifyToken: async () => {
+    console.log('authAPI.verifyToken called');
+    console.log('Making request to:', `${API_BASE_URL}/auth/me`);
     const response = await apiClient.get('/auth/me');
+    console.log('VerifyToken API response:', response.data);
     return response.data;
   },
 };

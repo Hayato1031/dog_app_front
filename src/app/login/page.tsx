@@ -16,16 +16,24 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== LOGIN FORM SUBMITTED ===');
+    console.log('Email:', email);
+    console.log('Password length:', password.length);
+    
     setLoading(true);
     setError('');
 
     try {
+      console.log('About to call login function...');
       await login(email, password);
+      console.log('Login function completed, redirecting...');
       router.push('/');
     } catch (err: unknown) {
+      console.error('Login error caught:', err);
       const error = err as { response?: { data?: { error?: string } } };
       setError(error.response?.data?.error || 'ログインに失敗しました');
     } finally {
+      console.log('Login process completed, setting loading to false');
       setLoading(false);
     }
   };
