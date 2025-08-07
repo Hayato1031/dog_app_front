@@ -85,12 +85,22 @@ export default function MedicineForm({ medicine, isOpen, onClose, onSuccess }: M
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="warm-card max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div 
+      className="modal-overlay bg-black bg-opacity-50 z-60"
+    >
+      {/* モーダルコンテナ */}
+      <div className="h-full flex items-center justify-center" style={{
+        padding: '2rem 1rem'
+      }}>
+        <div className="warm-card w-full max-w-md flex flex-col" style={{
+          maxHeight: 'calc(100vh - 4rem)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+        }}>
         <div className="flex items-center justify-between p-6 border-b-2 border-orange-200">
           <div className="flex items-center space-x-3">
-            <Pill size={28} className="text-orange-600" />
-            <h2 className="text-xl font-bold text-orange-800">
+            <Pill size={24} className="text-orange-600" />
+            <h2 className="text-lg font-semibold text-orange-800">
               {medicine ? '薬の編集' : '薬の追加'}
             </h2>
           </div>
@@ -102,122 +112,129 @@ export default function MedicineForm({ medicine, isOpen, onClose, onSuccess }: M
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <div className="bg-red-100 border-2 border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center space-x-2">
-              <X size={16} className="text-red-600" />
-              <span>{error}</span>
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          {/* スクロール可能なコンテンツ領域 */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4" style={{ minHeight: 0 }}>
+            {error && (
+              <div className="bg-red-100 border-2 border-red-300 text-red-800 px-4 py-3 rounded-lg flex items-center space-x-2">
+                <X size={16} className="text-red-600" />
+                <span>{error}</span>
+              </div>
+            )}
 
-          <div>
-            <label htmlFor="name" className="flex items-center space-x-2 text-sm font-bold text-orange-800 mb-2">
-              <Tag size={16} />
-              <span>薬の名前 *</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              required
-              className="warm-input w-full px-4 py-3 text-orange-900 placeholder-orange-400"
-              placeholder="薬の名前を入力してください"
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="unit" className="flex items-center space-x-2 text-sm font-bold text-orange-800 mb-2">
-              <Ruler size={16} />
-              <span>単位 *</span>
-            </label>
-            <input
-              type="text"
-              id="unit"
-              required
-              className="warm-input w-full px-4 py-3 text-orange-900 placeholder-orange-400"
-              placeholder="錠、ml、粒、包など"
-              value={formData.unit}
-              onChange={(e) => handleChange('unit', e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="flex items-center space-x-2 text-sm font-bold text-orange-800">
-              <Clock size={16} />
-              <span>用量設定</span>
-            </h3>
-            
             <div>
-              <label htmlFor="morning_dose" className="flex items-center space-x-2 text-sm font-medium text-orange-700 mb-2">
-                <Sunrise size={16} />
-                <span>朝の用量</span>
+              <label htmlFor="name" className="block text-sm font-bold text-orange-800 mb-2">
+                薬の名前 *
               </label>
               <input
-                type="number"
-                id="morning_dose"
-                step="0.01"
-                min="0"
-                className="warm-input w-full px-4 py-3 text-orange-900 placeholder-orange-400"
-                placeholder="0.00"
-                value={formData.morning_dose}
-                onChange={(e) => handleChange('morning_dose', e.target.value)}
+                type="text"
+                id="name"
+                required
+                className="warm-input w-full px-3 py-2 text-orange-900 placeholder-orange-400"
+                placeholder="薬の名前を入力してください"
+                value={formData.name}
+                onChange={(e) => handleChange('name', e.target.value)}
               />
             </div>
 
             <div>
-              <label htmlFor="evening_dose" className="flex items-center space-x-2 text-sm font-medium text-orange-700 mb-2">
-                <Sun size={16} />
-                <span>昼の用量</span>
+              <label htmlFor="unit" className="block text-sm font-bold text-orange-800 mb-2">
+                単位 *
               </label>
               <input
-                type="number"
-                id="evening_dose"
-                step="0.01"
-                min="0"
-                className="warm-input w-full px-4 py-3 text-orange-900 placeholder-orange-400"
-                placeholder="0.00"
-                value={formData.evening_dose}
-                onChange={(e) => handleChange('evening_dose', e.target.value)}
+                type="text"
+                id="unit"
+                required
+                className="warm-input w-full px-3 py-2 text-orange-900 placeholder-orange-400"
+                placeholder="錠、ml、粒、包など"
+                value={formData.unit}
+                onChange={(e) => handleChange('unit', e.target.value)}
               />
             </div>
 
-            <div>
-              <label htmlFor="night_dose" className="flex items-center space-x-2 text-sm font-medium text-orange-700 mb-2">
-                <Moon size={16} />
-                <span>夜の用量</span>
-              </label>
-              <input
-                type="number"
-                id="night_dose"
-                step="0.01"
-                min="0"
-                className="warm-input w-full px-4 py-3 text-orange-900 placeholder-orange-400"
-                placeholder="0.00"
-                value={formData.night_dose}
-                onChange={(e) => handleChange('night_dose', e.target.value)}
-              />
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-orange-800 flex items-center space-x-2">
+                <Clock size={16} />
+                <span>用量設定</span>
+              </h3>
+              
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="morning_dose" className="block text-sm font-medium text-yellow-700 mb-1 flex items-center space-x-2">
+                    <Sunrise size={14} />
+                    <span>朝の用量</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="morning_dose"
+                    step="0.01"
+                    min="0"
+                    className="warm-input w-full px-3 py-2 text-orange-900 placeholder-orange-400"
+                    placeholder="0.00"
+                    value={formData.morning_dose}
+                    onChange={(e) => handleChange('morning_dose', e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="evening_dose" className="block text-sm font-medium text-orange-700 mb-1 flex items-center space-x-2">
+                    <Sun size={14} />
+                    <span>昼の用量</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="evening_dose"
+                    step="0.01"
+                    min="0"
+                    className="warm-input w-full px-3 py-2 text-orange-900 placeholder-orange-400"
+                    placeholder="0.00"
+                    value={formData.evening_dose}
+                    onChange={(e) => handleChange('evening_dose', e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="night_dose" className="block text-sm font-medium text-purple-700 mb-1 flex items-center space-x-2">
+                    <Moon size={14} />
+                    <span>夜の用量</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="night_dose"
+                    step="0.01"
+                    min="0"
+                    className="warm-input w-full px-3 py-2 text-orange-900 placeholder-orange-400"
+                    placeholder="0.00"
+                    value={formData.night_dose}
+                    onChange={(e) => handleChange('night_dose', e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex space-x-3 pt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 border-2 border-orange-200 rounded-xl text-orange-700 hover:bg-orange-50 font-semibold transition-colors"
-            >
-              キャンセル
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 warm-button disabled:opacity-50 flex items-center justify-center space-x-2"
-            >
-              <Save size={18} />
-              <span>{loading ? '保存中...' : '保存'}</span>
-            </button>
+          {/* 固定されたボタン領域 */}
+          <div className="border-t-2 border-orange-200 p-6">
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border-2 border-orange-200 rounded-xl text-orange-700 hover:bg-orange-50 font-semibold transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-2 warm-button disabled:opacity-50 flex items-center justify-center space-x-2"
+              >
+                <Save size={16} />
+                <span>{loading ? '保存中...' : '保存'}</span>
+              </button>
+            </div>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
